@@ -19,7 +19,8 @@ say()  { printf '\033[1;33m▶\033[0m %s\n' "$*"; }
 ok()   { printf '\033[1;32m✓\033[0m %s\n' "$*"; }
 die()  { printf '\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
-# 1. 检查 Python
+# 1. 检查系统和 Python
+[ "$(uname -s)" = "Darwin" ] || die "目前只支持 macOS"
 command -v python3 >/dev/null 2>&1 || die "没找到 python3。macOS 请先运行 xcode-select --install，或到 https://www.python.org 安装 Python 3.9+"
 python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)' \
   || die "需要 Python 3.9 或更高版本，当前是 $(python3 -V 2>&1)"
