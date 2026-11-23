@@ -8,15 +8,33 @@
 - **自动解析文件名**：从 H3 的文件名里读出模型、模式（t2i / edit / t2va / fl2va / ai2v…）、分辨率、seed、时长、超分信息，可按类型、文件夹筛选，按同提示词 / 同 seed 分组。
 - 支持收藏、隐藏、搜索、上传新作品到 Drive、自定义标题。
 
+## 一键安装 / 升级 / 卸载
+
+适用于 macOS 和 Linux，需要 Python 3.9+（macOS 自带的就行）。
+
+**安装**：打开「终端」，粘贴下面这行回车。会装到 `~/h3-prompt-gallery`，装完自动打开画廊。
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/wwintj/h3-prompt-gallery/main/install.sh | bash
+```
+
+**升级**：双击安装文件夹里的 `升级.command`，或者再运行一次上面的安装命令。只更新程序，你的授权、配置和提示词都不会动；画廊正在运行的话会自动重启。
+
+**卸载**：双击 `卸载.command`。会先让你确认，并询问是否保留 `credentials.json`（保留的话，以后重装会自动用上，不用再去 Google Cloud 重新创建）。Google Drive 里的作品和提示词不会被删除。
+
+> 想装到别的位置：在安装命令的 `bash` 前加上 `H3_DIR=你的路径`，比如 `... | H3_DIR=~/Apps/h3 bash`。
+
 ## 使用方法
 
 ### 1. 启动
 
+双击 `启动画廊.command`，或者运行：
+
 ```bash
-python3 server.py
+python3 ~/h3-prompt-gallery/server.py
 ```
 
-然后在浏览器打开 <http://127.0.0.1:8765>。macOS 上也可以直接双击 `启动画廊.command`。
+然后在浏览器打开 <http://127.0.0.1:8765>。
 
 ### 2. 创建自己的 Google OAuth 客户端（只需一次）
 
@@ -47,4 +65,7 @@ python3 server.py
 | `server.py` | 本地服务器：Google 登录、读取 Drive、代理缩略图和视频、保存提示词 |
 | `index.html` | 画廊网页 |
 | `favicon.svg` | 浏览器标签图标 |
-| `启动画廊.command` | macOS 双击启动脚本 |
+| `启动画廊.command` | 双击启动 |
+| `升级.command` / `upgrade.sh` | 一键升级 |
+| `卸载.command` / `uninstall.sh` | 一键卸载 |
+| `install.sh` | 一键安装 |
