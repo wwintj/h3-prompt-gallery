@@ -1,0 +1,13 @@
+# 私密文件：OAuth 客户端密钥、登录令牌、个人配置与数据
+credentials.json
+client_secret*.json
+token.json
+config.json
+meta-backup.json
+OAuth-Client/
+
+# 系统与本机文件
+.DS_Store
+.claude/
+__pycache__/
+*.pyc

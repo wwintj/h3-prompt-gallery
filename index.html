@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H3 提示词画廊</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<style>
+:root{--bg:#f6f6f4;--panel:#fff;--text:#1d1d1f;--muted:#6e6e73;--line:#e3e3e0;--accent:#d9480f;--chip:#f0efec;--shadow:0 1px 3px rgba(0,0,0,.08);--ok:#2b8a3e}
+@media (prefers-color-scheme:dark){:root{--bg:#141414;--panel:#1e1e1e;--text:#ececec;--muted:#9a9a9a;--line:#2e2e2e;--accent:#ff7a3d;--chip:#2a2a2a;--shadow:none;--ok:#69db7c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+a{color:var(--accent)}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;flex-wrap:nowrap;gap:6px;align-items:center}
+@media (max-width:900px){header{flex-wrap:wrap}}
+header select{max-width:170px;
+}
+#folder{width:118px}#kind{width:128px}#sort{width:70px}#groupSel{width:92px}
+header select{padding:5px 8px;font-size:13px;text-overflow:ellipsis}
+header input[type=search]{padding:5px 10px;font-size:13px}
+header button.primary{padding:5px 12px;font-size:13px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+header > *{flex-shrink:0}
+header input[type=search]{flex-shrink:1}
+.tools{display:flex;gap:4px;align-items:center}
+.ib{padding:5px 7px;display:inline-flex;align-items:center;justify-content:center}
+.ib.on{background:var(--chip)}
+.sz{display:inline-flex;align-items:center;gap:4px;color:var(--muted);padding:0 4px}
+.sz input{width:64px}
+h1{font-size:16px;margin:0 6px 0 0;white-space:nowrap}
+h1 small{color:var(--muted);font-weight:400;margin-left:6px}
+input,select,textarea,button{font:inherit;color:inherit}
+input[type=search],input[type=text].in,select{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+input[type=search]{flex:1;min-width:80px}
+button{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:disabled{opacity:.5;cursor:default}
+button.primary,a.primary{background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:8px;padding:8px 16px;text-decoration:none;display:inline-block;cursor:pointer}
+button.on{border-color:var(--accent);color:var(--accent)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;padding:10px 20px 0}
+.chip{background:var(--chip);border:1px solid transparent;border-radius:999px;padding:2px 10px;font-size:12px;cursor:pointer;user-select:none}
+.chip.on{border-color:var(--accent);color:var(--accent)}
+main{padding:16px 20px 60px}
+.group{margin-bottom:28px}
+.group-head{display:flex;gap:10px;align-items:baseline;margin:0 0 10px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.group-head .p{flex:1;white-space:pre-wrap;word-break:break-word}
+.group-head .n{color:var(--muted);font-size:12px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--size,240px),1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.card:hover{border-color:var(--muted)}
+.card.hidden-item{opacity:.45}
+.thumb{position:relative;aspect-ratio:1/1;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:contain;display:block;position:absolute;inset:0}
+.thumb .noimg{color:#888;font-size:12px}
+.badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;border-radius:6px;padding:1px 6px;z-index:2}
+.fav{position:absolute;top:6px;right:8px;font-size:16px;z-index:2}
+.info{padding:8px 10px 10px;display:flex;flex-direction:column;gap:4px}
+.prompt{font-size:12.5px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.prompt.empty{color:var(--muted);font-style:italic}
+.meta-row{display:flex;justify-content:space-between;color:var(--muted);font-size:11.5px;gap:6px}
+.empty-state{text-align:center;color:var(--muted);padding:80px 20px}
+.fn-line{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fn{display:flex;flex-wrap:wrap;gap:6px}
+.fn span{background:var(--chip);border-radius:6px;padding:2px 8px;font-size:12px}
+.fn span b{font-weight:500;color:var(--muted);margin-right:4px}
+.fn span.click{cursor:pointer}
+.fn span.click:hover{color:var(--accent)}
+.up{color:var(--accent)}
+.iconbtn{display:inline-flex;align-items:center;gap:6px}
+.iconbtn svg{display:block}
+#appTitle{cursor:text;border-radius:6px;padding:2px 4px;margin:-2px -4px}
+#appTitle:hover{background:var(--chip)}
+#appTitle:hover::after{content:" ✎";color:var(--muted);font-weight:400}
+#titleIn{font:inherit;font-weight:700;font-size:16px;width:220px;background:var(--panel);border:1px solid var(--accent);border-radius:6px;padding:2px 6px}
+/* 详情侧栏：一屏放下 */
+#modal .dialog{height:calc(100vh - 40px)}
+.dside{gap:10px;padding:14px 16px;height:100%;max-height:none}
+.dhead{display:flex;gap:8px;align-items:flex-start}
+.fname{flex:1;font-weight:600;font-size:13px;line-height:1.35;word-break:break-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lbl{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:4px}
+button.sm{padding:2px 9px;font-size:12px;border-radius:6px}
+.dside textarea,.dside input[type=text]{padding:6px 8px;font-size:13px}
+.dside textarea{min-height:0}
+.field{display:flex;flex-direction:column;min-width:0}
+.field.grow{flex:1;min-height:140px}
+.field.grow textarea{flex:1;resize:none;min-height:100px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mono{font-family:ui-monospace,monospace;font-size:12px!important}
+.foot{padding-top:2px}
+/* setup */
+.setup{max-width:760px;margin:40px auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px 32px}
+.setup h2{margin:0 0 6px;font-size:20px}
+.setup .lead{color:var(--muted);margin:0 0 20px}
+.step{border-top:1px solid var(--line);padding:18px 0}
+.step h3{margin:0 0 8px;font-size:15px;display:flex;gap:8px;align-items:center}
+.step h3 .n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--chip);align-items:center;justify-content:center;font-size:12px}
+.step.done h3 .n{background:var(--ok);color:#fff}
+.step.todo{opacity:.5}
+.step ol{margin:6px 0 0;padding-left:20px}
+.step li{margin:4px 0}
+code{background:var(--chip);padding:1px 6px;border-radius:4px;font-size:12.5px;word-break:break-all}
+.err{color:#e03131;margin-top:8px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;z-index:20;padding:20px}
+.modal.open{display:flex;align-items:center;justify-content:center}
+.dialog{background:var(--panel);border-radius:14px;width:min(1400px,100%);max-height:100%;display:flex;overflow:hidden}
+.viewer{flex:1.6;background:#000;display:flex;align-items:center;justify-content:center;min-height:300px;position:relative}
+.viewer img,.viewer video{max-width:100%;max-height:calc(100vh - 40px);object-fit:contain}
+.viewer .loading{position:absolute;color:#aaa}
+.nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);color:#fff;border:none;font-size:22px;width:40px;height:60px;z-index:2}
+.nav.l{left:8px}.nav.r{right:8px}
+.side{flex:1;min-width:320px;max-width:480px;padding:18px;overflow:auto;display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 40px)}
+.side label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.side textarea,.side input[type=text]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+.side textarea{resize:vertical;min-height:70px}
+#mPrompt{min-height:150px}
+.rate span{font-size:22px;cursor:pointer;color:var(--line)}
+.rate span.on{color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.file-info{font-size:12px;color:var(--muted);word-break:break-all}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 16px;border-radius:8px;opacity:0;transition:.2s;z-index:30;pointer-events:none}
+.toast.show{opacity:1}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:30px;text-align:center;color:var(--muted)}
+.drop.hover{border-color:var(--accent);color:var(--accent)}
+#dropOverlay{position:fixed;inset:0;background:rgba(217,72,15,.12);border:3px dashed var(--accent);z-index:15;display:none;align-items:center;justify-content:center;font-size:20px;color:var(--accent)}
+@media (max-width:820px){#modal .dialog{height:auto}.dside{height:auto}.two{grid-template-columns:1fr}.dialog{flex-direction:column;overflow:auto}.side{max-width:none;min-width:0;max-height:none}.viewer img,.viewer video{max-height:60vh}.setup{padding:20px 16px;margin:16px}}
+</style>
+</head>
+<body>
+<header id="bar" style="display:none">
+  <h1><span id="appTitle" title="点击修改标题">H3 提示词画廊</span><small id="count"></small></h1>
+  <input type="search" id="q" placeholder="搜索…" title="搜索提示词 / 备注 / 文件名 / 标签 / seed">
+  <select id="folder" title="文件夹（包含子文件夹）"><option value="">全部文件夹</option></select>
+  <select id="kind" title="类型 / 生成模式（从文件名识别）"><option value="">全部类型</option></select>
+  <select id="sort" title="排序"><option value="new">最新</option><option value="old">最早</option><option value="name">文件名</option></select>
+  <select id="groupSel" title="分组对比"><option value="">不分组</option><option value="prompt">同提示词</option><option value="seed">同 seed</option></select>
+  <span class="tools">
+    <button id="favBtn" class="ib" title="只看收藏"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg></button>
+    <button id="hidBtn" class="ib" title="显示已隐藏的作品"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    <span class="sz" title="缩略图大小"><input type="range" id="size" min="140" max="480" value="240"></span>
+    <button id="reload" class="ib" title="从 Drive 刷新"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg></button>
+    <button id="setBtn" class="ib" title="设置：更换文件夹 / 账号"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </span>
+  <button class="primary iconbtn" id="addBtn" title="上传图片/视频到 Drive 文件夹"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>上传</button>
+</header>
+<div class="tags" id="tagBar"></div>
+<main id="main"><div class="empty-state">加载中…</div></main>
+
+<div class="modal" id="modal">
+  <div class="dialog">
+    <div class="viewer" id="viewer"><span class="loading">从 Drive 加载中…</span><button class="nav l" id="prev">‹</button><button class="nav r" id="next">›</button></div>
+    <div class="side dside">
+      <div class="dhead"><div class="fname" id="mName"></div><button class="sm" id="mClose" title="关闭 (Esc)">✕</button></div>
+      <div class="fn" id="mFn"></div>
+      <div class="field grow">
+        <div class="lbl">提示词<span class="spacer"></span><button class="sm" id="copyP">复制</button><button class="sm" id="sameP">同提示词</button><button class="sm" id="sameS">同 seed</button></div>
+        <textarea id="mPrompt" placeholder="生成时用的提示词"></textarea>
+      </div>
+      <div class="two">
+        <div class="field"><div class="lbl">反向提示词</div><textarea id="mNeg" rows="2"></textarea></div>
+        <div class="field"><div class="lbl">参数 JSON</div><textarea id="mParams" rows="2" class="mono" placeholder='例：{"duration":6}'></textarea></div>
+      </div>
+      <div class="field"><div class="lbl">标签（逗号分隔）</div><input type="text" id="mTags"></div>
+      <div class="field"><div class="lbl">备注 / 调整思路</div><textarea id="mNotes" rows="2" placeholder="比如：光线太硬，下次加 soft lighting"></textarea></div>
+      <div class="row foot">
+        <button class="sm" id="mFav">☆ 收藏</button>
+        <button class="sm" id="mHide" title="只是在画廊里不显示，不会删除 Drive 文件">隐藏</button>
+        <a id="mOpen" target="_blank" rel="noopener" style="font-size:12px">在 Drive 中打开</a>
+        <span class="spacer"></span>
+        <button class="primary" id="mSave">保存 ⌘S</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="addModal">
+  <div class="dialog" style="max-width:640px;flex-direction:column">
+    <div class="side" style="max-width:none">
+      <div class="row"><b>上传到 Drive 文件夹</b><span class="spacer"></span><button id="aClose">✕</button></div>
+      <div class="drop" id="drop">把图片/视频拖到这里，或 <button id="pick">选择文件</button><input type="file" id="file" multiple accept="image/*,video/*" hidden><div id="picked" style="margin-top:8px"></div></div>
+      <div><label>提示词（这批文件共用）</label><textarea id="aPrompt" style="min-height:120px"></textarea></div>
+      <div><label>反向提示词</label><textarea id="aNeg"></textarea></div>
+      <div><label>参数 JSON</label><textarea id="aParams" style="font-family:ui-monospace,monospace;font-size:12px" placeholder='{"seed":123}'></textarea></div>
+      <div><label>标签（逗号分隔）</label><input type="text" id="aTags"></div>
+      <div class="row"><span class="spacer"></span><button class="primary" id="aSave">上传</button></div>
+    </div>
+  </div>
+</div>
+<div id="dropOverlay">松开即可上传到 Drive</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let items = [], view = [], cur = -1, curFav = false, curHidden = false, status = {};
+const state = { q:'', type:'', folder:'', mode:'', sort:'new', fav:false, group:'', showHidden:false, tags:new Set() };
+try { const s = JSON.parse(localStorage.getItem('h3state')||'{}'); delete s.tags; if (s.sort === 'rate') s.sort = 'new'; Object.assign(state, s); if (state.group === true) state.group = 'prompt'; if (state.group === false) state.group = ''; } catch(e){}
+
+// ---------------- 文件名解析 ----------------
+// 例：minimax_h3_image_t2i_4096x4096_20261122_163859_dur13s_seed1846306620.jpg
+//     minimax_h3_t2va_20261122_180459_seed447875961_ReCaVSR_2K_1440x2496.mp4
+//     longcat_avatar_ai2v_20261122_..._dur10s_seed123.mp4
+// 模式的中文名是根据缩写推测的，不对的话直接改这里
+const MODE_LABEL = {
+  t2i:'文生图', edit:'图片编辑', i2i:'图生图',
+  t2v:'文生视频', t2va:'文生视频(带音频)', i2v:'图生视频', i2va:'图生视频(带音频)',
+  fl2v:'首尾帧视频', fl2va:'首尾帧视频(带音频)', ai2v:'音频+图生视频',
+};
+const modeName = m => MODE_LABEL[m] || m;
+function parseName(name){
+  const tk = name.replace(/\.[^.]+$/, '').split('_');
+  const di = tk.findIndex((t,i) => /^\d{8}$/.test(t) && /^\d{6}$/.test(tk[i+1]||''));
+  if (di < 1) return null;
+  const pre = tk.slice(0, di), post = tk.slice(di + 2), d = tk[di], t = tk[di+1];
+  const fn = { gen: new Date(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}T${t.slice(0,2)}:${t.slice(2,4)}:${t.slice(4,6)}`).getTime() };
+  const ri = pre.findIndex(x => /^\d+x\d+$/.test(x));
+  if (ri >= 0) fn.res = pre.splice(ri, 1)[0];
+  fn.mode = pre.pop();
+  if (/^(image|video)$/.test(pre[pre.length-1])) pre.pop();
+  fn.model = pre.join('_');
+  for (let i = 0; i < post.length; i++) {
+    const x = post[i]; let m;
+    if ((m = x.match(/^seed(\d+)$/))) fn.seed = m[1];
+    else if ((m = x.match(/^dur(\d+(?:\.\d+)?)s$/))) fn.dur = +m[1];
+    else if (/^\d+x\d+$/.test(x)) fn.outRes = x;
+    else if (/^\d+K$/i.test(x)) fn.upTo = x;
+    else fn.upscaler = fn.upscaler ? fn.upscaler + '_' + x : x;
+  }
+  fn.key = fn.model + '|' + fn.mode;
+  return fn;
+}
+const genTime = it => it.fn?.gen || Date.parse(it.mtime) || 0;
+function fnLine(it){
+  const f = it.fn; if (!f) return '';
+  return [modeName(f.mode), f.outRes || f.res, f.upscaler ? `<span class="up">超分${esc(f.upTo||'')}</span>` : '', f.seed ? 'seed ' + f.seed : '']
+    .filter(Boolean).map(x => x.startsWith('<') ? x : esc(x)).join(' · ');
+}
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mediaUrl = id => '/media/' + id;
+const thumbUrl = id => '/thumb/' + id + '?s=' + (Math.ceil(+$('#size').value * (devicePixelRatio||1) / 100) * 100);
+const tagsOf = it => Array.isArray(it.meta.tags) ? it.meta.tags : (it.meta.tags ? String(it.meta.tags).split(/[,，]/).map(s=>s.trim()).filter(Boolean) : []);
+const fmtSize = n => n > 1<<20 ? (n/(1<<20)).toFixed(1)+' MB' : Math.round(n/1024)+' KB';
+const fmtTime = t => new Date(t).toLocaleString('zh-CN',{hour12:false});
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2000); }
+function saveState(){ try{ localStorage.setItem('h3state', JSON.stringify({q:state.q,type:state.type,folder:state.folder,mode:state.mode,sort:state.sort,fav:state.fav,group:state.group,showHidden:state.showHidden,size:$('#size').value})); }catch(e){} }
+
+async function api(path, opts={}) {
+  const res = await fetch(path, {...opts, headers:{'X-H3':'1', ...(opts.headers||{})}});
+  const data = await res.json().catch(()=>({error:'服务没有响应'}));
+  if (res.status === 401) { await boot(); throw new Error('需要重新登录 Google'); }
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+// ---------------- 首次设置 ----------------
+async function boot(){
+  status = await (await fetch('/api/status')).json();
+  applyTitle(status.title);
+  if (status.has_credentials && status.authorized && status.folder_id) { $('#bar').style.display=''; return load(); }
+  showSetup();
+}
+
+function showSetup(force){
+  $('#bar').style.display = force ? '' : 'none';
+  $('#tagBar').innerHTML = '';
+  const s = status, err = new URLSearchParams(location.search).get('auth_error');
+  if (err) history.replaceState(null,'','/');
+  const st = (done, active) => done ? 'done' : (active ? '' : 'todo');
+  $('#main').innerHTML = `<div class="setup">
+    <h2>连接你的 Google Drive</h2>
+    <p class="lead">只需要设置一次。图片和视频一直留在 Drive 里，网页上看的时候才临时读取，不占本地空间。</p>
+
+    <div class="step ${st(s.has_credentials, true)}">
+      <h3><span class="n">${s.has_credentials?'✓':'1'}</span>在 Google Cloud 创建授权文件 ${s.has_credentials?'<small style="color:var(--ok)">已完成</small>':''}</h3>
+      ${s.has_credentials ? '' : `<ol>
+        <li>打开 <a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">Google Cloud 控制台 · 新建项目</a>，名字随便填（比如 h3-gallery），点「创建」。</li>
+        <li>打开 <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com" target="_blank" rel="noopener">Google Drive API</a>，确认顶部选中的是刚建的项目，点「启用」。</li>
+        <li>打开 <a href="https://console.cloud.google.com/auth/overview" target="_blank" rel="noopener">Google Auth Platform</a>，点「开始」：应用名称随便填，用户支持邮箱选你自己；受众选「外部」；联系邮箱填你自己 → 创建。</li>
+        <li>左侧「目标对象 / Audience」→「测试用户」→ 添加你自己的 Gmail 地址。</li>
+        <li>左侧「客户端 / Clients」→「创建客户端」→ 应用类型选 <b>桌面应用</b> → 创建 → 点「下载 JSON」。</li>
+        <li>把下载的文件改名为 <code>credentials.json</code>，放进这个文件夹：<code>${esc(s.app_dir||'程序所在文件夹')}</code></li>
+        <li>放好后 <button onclick="boot()">点这里检查</button></li>
+      </ol>`}
+    </div>
+
+    <div class="step ${st(s.authorized, s.has_credentials)}">
+      <h3><span class="n">${s.authorized?'✓':'2'}</span>登录 Google 并授权 ${s.authorized?'<small style="color:var(--ok)">已完成</small>':''}</h3>
+      ${s.authorized ? `<button onclick="logout()">退出登录 / 换账号</button>` : (s.has_credentials ? `
+        <p>点下面按钮，在 Google 页面选你的账号。因为是你自己建的应用，会提示「Google 尚未验证此应用」，点「继续」即可，然后勾选允许访问 Drive。</p>
+        <a class="primary" href="/auth/login">登录 Google</a>
+        ${err?`<div class="err">登录失败：${esc(err)}</div>`:''}` : '<p>先完成第 1 步</p>')}
+    </div>
+
+    <div class="step ${st(s.folder_id && !force, s.authorized)}">
+      <h3><span class="n">${s.folder_id && !force?'✓':'3'}</span>选择存放作品的 Drive 文件夹 ${s.folder_name?`<small style="color:var(--muted)">当前：${esc(s.folder_name)}</small>`:''}</h3>
+      ${s.authorized ? `
+        <p>在 Google Drive 网页里打开那个文件夹，复制浏览器地址栏的链接（形如 <code>https://drive.google.com/drive/folders/xxxx</code>），粘贴到这里。子文件夹也会一起读取。</p>
+        <div class="row"><input type="text" class="in" id="folderIn" style="flex:1" placeholder="粘贴文件夹链接"><button class="primary" id="folderBtn">确定</button></div>
+        <div class="err" id="folderErr"></div>` : '<p>先完成第 2 步</p>'}
+    </div>
+    ${force && s.folder_id ? '<div class="row"><span class="spacer"></span><button onclick="boot()">返回画廊</button></div>' : ''}
+  </div>`;
+  const fb = $('#folderBtn');
+  if (fb) fb.onclick = async () => {
+    fb.disabled = true; $('#folderErr').textContent = '';
+    try { const r = await api('/api/folder', {method:'POST', body: JSON.stringify({folder: $('#folderIn').value})}); toast('已连接文件夹：' + r.folder_name); boot(); }
+    catch(e){ $('#folderErr').textContent = e.message; fb.disabled = false; }
+  };
+}
+async function logout(){ await api('/api/logout',{method:'POST'}); boot(); }
+
+// ---------------- 画廊 ----------------
+async function load(force){
+  if (!items.length) $('#main').innerHTML = `<div class="empty-state">正在读取 Drive 文件夹「${esc(status.folder_name||'')}」…</div>`;
+  try { items = await api('/api/items' + (force?'?refresh=1':'')); }
+  catch(e){ $('#main').innerHTML = `<div class="empty-state">读取失败：${esc(e.message)}<br><br><button onclick="load(true)">重试</button></div>`; return; }
+  items.forEach(it => it.fn = parseName(it.name));
+  buildFolderOptions();
+  buildModeOptions();
+  render();
+}
+
+// 文件夹选项：每一级路径都列出来，数量包含其下的子文件夹
+function buildFolderOptions(){
+  const cnt = new Map();
+  items.forEach(it => {
+    if (!it.folder) { cnt.set('/', (cnt.get('/')||0) + 1); return; }
+    const parts = it.folder.split('/');
+    parts.forEach((_, i) => { const p = parts.slice(0, i+1).join('/'); cnt.set(p, (cnt.get(p)||0) + 1); });
+  });
+  // 父文件夹排在子文件夹前面；同级里按名字倒序（2026.12 在 2026.11 前面），子文件夹按名字正序
+  const cmpPath = (a, b) => {
+    if (a === '/' || b === '/') return a === '/' ? -1 : 1;
+    const x = a.split('/'), y = b.split('/');
+    for (let i = 0; i < Math.min(x.length, y.length); i++) {
+      if (x[i] !== y[i]) { const c = x[i].localeCompare(y[i], 'zh', {numeric:true}); return i === 0 ? -c : c; }
+    }
+    return x.length - y.length;
+  };
+  const sorted = [...cnt].sort((a,b) => cmpPath(a[0], b[0]));
+  const paths = sorted.map(([p]) => p);
+  const parentOf = p => p.includes('/') ? p.slice(0, p.lastIndexOf('/')) : '';
+  // 是否是同级里的最后一个（决定用 └─ 还是 ├─）
+  const isLast = p => { const par = parentOf(p), sib = paths.filter(x => x !== '/' && parentOf(x) === par); return sib[sib.length-1] === p; };
+  const NB = ' ';
+  const opts = sorted.map(([p, n]) => {
+    if (p === '/') return `<option value="/">📄 根目录下的文件 (${n})</option>`;
+    const parts = p.split('/'), name = esc(parts[parts.length-1]);
+    if (parts.length === 1) return `<option value="${esc(p)}">📁 ${name}${NB}${NB}(${n})</option>`;
+    let prefix = NB + NB;
+    for (let i = 2; i < parts.length; i++) prefix += isLast(parts.slice(0, i).join('/')) ? NB.repeat(4) : '│' + NB.repeat(3);
+    prefix += isLast(p) ? '└─' + NB : '├─' + NB;
+    return `<option value="${esc(p)}">${prefix}📂 ${name}${NB}${NB}(${n})</option>`;
+  });
+  $('#folder').innerHTML = `<option value="">全部文件夹</option>` + opts.join('');
+  if (![...$('#folder').options].some(o => o.value === state.folder)) state.folder = '';
+  $('#folder').value = state.folder;
+}
+
+// 类型 + 模式合并成一个下拉：图片 / 视频 分组，下面是各生成模式
+function buildModeOptions(){
+  const cnt = new Map(), kindOf = new Map();
+  items.forEach(it => { const k = it.fn ? it.fn.key : '?'; cnt.set(k, (cnt.get(k)||0) + 1); kindOf.set(k, it.type); });
+  const label = k => {
+    if (k === '?') return '其他文件名';
+    const [model, mode] = k.split('|');
+    return `${mode} ${modeName(mode)}${model !== 'minimax_h3' ? ' · ' + model : ''}`;
+  };
+  const group = (type, title) => {
+    const ks = [...cnt.keys()].filter(k => kindOf.get(k) === type).sort();
+    const n = items.filter(it => it.type === type).length;
+    if (!n) return '';
+    let html = `<optgroup label="${title}"><option value="t:${type}">全部${title} (${n})</option>`;
+    html += ks.map(k => `<option value="m:${esc(k)}">${esc(label(k))} (${cnt.get(k)})</option>`).join('');
+    const upN = items.filter(it => it.type === type && it.fn?.upscaler).length;
+    if (upN) html += `<option value="up">超分版 (${upN})</option>`;
+    return html + '</optgroup>';
+  };
+  $('#kind').innerHTML = `<option value="">全部类型</option>` + group('image', '图片') + group('video', '视频');
+  const cur = kindValue();
+  if (![...$('#kind').options].some(o => o.value === cur)) { state.type = ''; state.mode = ''; }
+  $('#kind').value = kindValue();
+}
+const kindValue = () => state.type ? 't:' + state.type : state.mode === 'up' ? 'up' : state.mode ? 'm:' + state.mode : '';
+
+function filtered(){
+  const q = state.q.trim().toLowerCase();
+  let r = items.filter(it => {
+    if (!state.showHidden && it.meta.hidden) return false;
+    if (state.type && it.type !== state.type) return false;
+    if (state.folder === '/' ? it.folder : state.folder && it.folder !== state.folder && !it.folder.startsWith(state.folder + '/')) return false;
+    if (state.mode === 'up' ? !it.fn?.upscaler : state.mode && (it.fn ? it.fn.key : '?') !== state.mode) return false;
+    if (state.fav && !it.meta.favorite) return false;
+    const tg = tagsOf(it);
+    for (const t of state.tags) if (!tg.includes(t)) return false;
+    if (q) {
+      const hay = [it.name, it.folder, it.meta.prompt, it.meta.negative_prompt, it.meta.notes, tg.join(' '), JSON.stringify(it.meta.params||'')].join(' ').toLowerCase();
+      if (!q.split(/\s+/).every(w => hay.includes(w))) return false;
+    }
+    return true;
+  });
+  const t = genTime;
+  const cmp = { new:(a,b)=>t(b)-t(a), old:(a,b)=>t(a)-t(b), name:(a,b)=>(a.folder+a.name).localeCompare(b.folder+b.name) };
+  return r.sort(cmp[state.sort] || cmp.new);
+}
+
+function card(it, idx){
+  const p = it.meta.prompt || '';
+  const media = it.has_thumb ? `<img src="${thumbUrl(it.id)}" loading="lazy" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'noimg',textContent:'无法加载预览'}))">`
+    : (it.type==='video' ? `<span class="noimg">视频（Drive 还在生成预览）</span>` : `<img src="${mediaUrl(it.id)}" loading="lazy" alt="">`);
+  return `<div class="card ${it.meta.hidden?'hidden-item':''}" data-i="${idx}">
+    <div class="thumb">${media}<span class="badge">${it.type==='video'?'▶ ':''}${esc(it.fn ? it.fn.mode : (it.type==='video'?'视频':'图片'))}${it.duration?' '+it.duration.toFixed(0)+'s':''}</span>${it.meta.favorite?'<span class="fav">⭐</span>':''}</div>
+    <div class="info">
+      ${it.fn ? `<div class="fn-line">${fnLine(it)}</div>` : ''}
+      <div class="prompt ${p?'':'empty'}">${esc(p || '（还没有提示词，点开补充）')}</div>
+      <div class="meta-row"><span></span><span>${esc(tagsOf(it).join(' · ') || (it.folder ? it.folder : ''))}</span></div>
+    </div></div>`;
+}
+
+function render(){
+  view = filtered();
+  $('#count').textContent = view.length === items.length ? `${items.length}` : `${view.length}/${items.length}`;
+  $('#count').title = `Drive 文件夹：${status.folder_name || ''}`;
+  const all = {}; items.forEach(it => tagsOf(it).forEach(t => all[t]=(all[t]||0)+1));
+  $('#tagBar').innerHTML = Object.entries(all).sort((a,b)=>b[1]-a[1]).map(([t,n]) =>
+    `<span class="chip ${state.tags.has(t)?'on':''}" data-t="${esc(t)}">${esc(t)} ${n}</span>`).join('');
+  const main = $('#main');
+  if (!items.length) { main.innerHTML = `<div class="empty-state">文件夹「${esc(status.folder_name)}」里还没有图片或视频。<br>可以点右上角「＋ 上传到 Drive」，或者直接往 Drive 文件夹里放文件后点「刷新」。</div>`; return; }
+  if (!view.length) { main.innerHTML = '<div class="empty-state">没有符合条件的结果</div>'; return; }
+  if (state.group) {
+    const bySeed = state.group === 'seed';
+    const keyOf = it => bySeed ? (it.fn?.seed ? it.fn.model + '|' + it.fn.seed : '') : (it.meta.prompt||'').trim();
+    const groups = new Map();
+    view.forEach((it,i) => { const k=keyOf(it); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push([it,i]); });
+    const head = (k, arr) => {
+      if (!bySeed) return esc(k || '（无提示词）');
+      if (!k) return '（文件名里没有 seed）';
+      const f = arr[0][0].fn, ps = [...new Set(arr.map(([it]) => (it.meta.prompt||'').trim()).filter(Boolean))];
+      return `<b>seed ${esc(f.seed)}</b> · ${esc(f.model)} · ${esc([...new Set(arr.map(([it]) => it.fn.mode))].join(' / '))}` +
+        (ps.length ? `<br><span style="color:var(--muted)">${esc(ps.join('  ⇢  '))}</span>` : '');
+    };
+    main.innerHTML = [...groups].map(([k, arr]) => `<div class="group" data-k="${esc(k)}">
+      <div class="group-head"><div class="p">${head(k, arr)}</div><span class="n">${arr.length} 个结果</span></div>
+      <div class="grid">${arr.map(([it,i])=>card(it,i)).join('')}</div></div>`).join('');
+  } else {
+    main.innerHTML = `<div class="grid">${view.map(card).join('')}</div>`;
+  }
+}
+
+// 鼠标悬停在视频卡片上时才从 Drive 拉视频播放
+$('#main').addEventListener('mouseover', e => {
+  const c = e.target.closest('.card'); if (!c || c._v) return;
+  const it = view[+c.dataset.i]; if (!it || it.type!=='video') return;
+  const v = Object.assign(document.createElement('video'), {src: mediaUrl(it.id), muted:true, loop:true, playsInline:true});
+  c._v = v; c.querySelector('.thumb').appendChild(v); v.play().catch(()=>{});
+});
+$('#main').addEventListener('mouseout', e => {
+  const c = e.target.closest('.card'); if (!c || c.contains(e.relatedTarget) || !c._v) return;
+  c._v.pause(); c._v.removeAttribute('src'); c._v.load(); c._v.remove(); c._v = null;
+});
+
+// ---------------- 详情 ----------------
+function open(i){
+  cur = i; const it = view[i]; if (!it) return;
+  const v = $('#viewer');
+  v.querySelectorAll('img,video').forEach(e=>{ if(e.pause) e.pause(); e.remove(); });
+  const el = document.createElement(it.type==='video'?'video':'img');
+  if (it.type==='video'){ el.controls=true; el.autoplay=true; el.loop=true; el.playsInline=true; if (it.has_thumb) el.poster = thumbUrl(it.id); }
+  const loading = v.querySelector('.loading');
+  loading.textContent = '从 Drive 加载中…'; loading.style.display = '';
+  el.addEventListener(it.type==='video' ? 'loadeddata' : 'load', () => { loading.style.display = 'none'; });
+  el.addEventListener('error', () => { loading.textContent = '加载失败，可以点「在 Drive 中打开」查看'; });
+  el.src = mediaUrl(it.id);
+  v.prepend(el);
+  $('#mName').textContent = it.name; $('#mName').title = (it.folder ? it.folder + '/' : '') + it.name;
+  $('#mOpen').href = `https://drive.google.com/file/d/${it.id}/view`;
+  const f = it.fn || {}, chip = (k, v, cls='', attr='') => v ? `<span class="${cls}" ${attr}>${k ? `<b>${k}</b>` : ''}${esc(v)}</span>` : '';
+  $('#mFn').innerHTML = [
+    chip('', f.mode ? `${f.model} · ${modeName(f.mode)} ${f.mode}` : ''),
+    chip('', f.outRes || f.res || (it.width ? `${it.width}x${it.height}` : '')),
+    chip('时长', it.duration ? it.duration.toFixed(1) + 's' : ''),
+    chip('dur', f.dur != null ? f.dur + 's' : ''),
+    chip('seed', f.seed, 'click', `title="点击复制 seed" data-copy="${esc(f.seed||'')}"`),
+    chip('超分', f.upscaler ? `${f.upscaler} ${f.upTo||''}` : '', 'up'),
+    chip('', fmtTime(f.gen || it.mtime)),
+    chip('', fmtSize(it.size)),
+  ].join('');
+  $('#sameS').style.display = f?.seed ? '' : 'none';
+  $('#mPrompt').value = it.meta.prompt || '';
+  $('#mNeg').value = it.meta.negative_prompt || '';
+  $('#mParams').value = it.meta.params ? (typeof it.meta.params === 'string' ? it.meta.params : JSON.stringify(it.meta.params, null, 2)) : '';
+  $('#mTags').value = tagsOf(it).join(', ');
+  $('#mNotes').value = it.meta.notes || '';
+  curFav = !!it.meta.favorite; drawFav();
+  curHidden = !!it.meta.hidden; $('#mHide').textContent = curHidden ? '取消隐藏' : '隐藏';
+  $('#modal').classList.add('open');
+}
+function closeModal(){ $('#modal').classList.remove('open'); $('#viewer').querySelectorAll('video').forEach(v=>{ v.pause(); v.removeAttribute('src'); v.load(); }); }
+function drawFav(){ $('#mFav').textContent = curFav ? '★ 已收藏' : '☆ 收藏'; $('#mFav').classList.toggle('on', curFav); }
+function parseParams(s){ s=s.trim(); if(!s) return null; try{ return JSON.parse(s); }catch(e){ return s; } }
+
+async function save(extra={}){
+  const it = view[cur]; if (!it) return;
+  const meta = {
+    prompt: $('#mPrompt').value, negative_prompt: $('#mNeg').value,
+    params: parseParams($('#mParams').value),
+    tags: $('#mTags').value.split(/[,，]/).map(s=>s.trim()).filter(Boolean),
+    notes: $('#mNotes').value, favorite: curFav, hidden: curHidden, ...extra,
+  };
+  $('#mSave').disabled = true; $('#mSave').textContent = '保存中…';
+  try {
+    it.meta = await api('/api/meta', {method:'POST', body: JSON.stringify({id: it.id, name: it.name, meta})});
+    toast('已保存到 Drive');
+    const keep = it.id; render(); cur = view.findIndex(x=>x.id===keep);
+  } catch(e){ toast('保存失败：' + e.message); }
+  finally { $('#mSave').disabled = false; $('#mSave').textContent = '保存 (⌘S)'; }
+}
+
+$('#main').addEventListener('click', e => { const c = e.target.closest('.card'); if (c) open(+c.dataset.i); });
+$('#tagBar').addEventListener('click', e => { const t=e.target.dataset.t; if(!t) return; state.tags.has(t)?state.tags.delete(t):state.tags.add(t); render(); });
+$('#mFav').onclick = () => { curFav=!curFav; drawFav(); };
+$('#mHide').onclick = async () => { curHidden=!curHidden; await save(); if (curHidden && !state.showHidden) closeModal(); else $('#mHide').textContent = curHidden ? '取消隐藏' : '隐藏'; };
+$('#mSave').onclick = () => save();
+$('#mClose').onclick = closeModal;
+$('#prev').onclick = () => open((cur-1+view.length)%view.length);
+$('#next').onclick = () => open((cur+1)%view.length);
+$('#modal').addEventListener('click', e => { if (e.target.id==='modal') closeModal(); });
+$('#copyP').onclick = async () => { try{ await navigator.clipboard.writeText($('#mPrompt').value); toast('已复制提示词'); }catch(e){ $('#mPrompt').select(); document.execCommand('copy'); toast('已复制'); } };
+function jumpToGroup(mode, key){
+  closeModal(); state.group = mode; state.q = ''; syncUI(); render();
+  setTimeout(() => { const g = [...document.querySelectorAll('.group')].find(x => x.dataset.k === key); g?.scrollIntoView({block:'start'}); }, 50);
+}
+$('#sameP').onclick = () => jumpToGroup('prompt', $('#mPrompt').value.trim());
+$('#sameS').onclick = () => { const f = view[cur]?.fn; if (f?.seed) jumpToGroup('seed', f.model + '|' + f.seed); };
+$('#mFn').addEventListener('click', async e => { const v = e.target.closest('[data-copy]')?.dataset.copy; if (!v) return;
+  try { await navigator.clipboard.writeText(v); toast('已复制 seed ' + v); } catch(err){ toast('seed：' + v); } });
+document.addEventListener('keydown', e => {
+  if (!$('#modal').classList.contains('open')) return;
+  if ((e.metaKey||e.ctrlKey) && e.key==='s'){ e.preventDefault(); save(); return; }
+  if (e.target.matches('textarea,input')) return;
+  if (e.key==='Escape') closeModal();
+  if (e.key==='ArrowLeft') $('#prev').click();
+  if (e.key==='ArrowRight') $('#next').click();
+});
+
+// ---------------- 工具栏 ----------------
+function syncUI(){
+  $('#q').value=state.q; $('#sort').value=state.sort; $('#groupSel').value=state.group;
+  $('#favBtn').classList.toggle('on',state.fav); $('#hidBtn').classList.toggle('on',state.showHidden);
+  saveState();
+}
+$('#q').oninput = e => { state.q=e.target.value; saveState(); render(); };
+$('#kind').onchange = e => { const v = e.target.value; state.type = v.startsWith('t:') ? v.slice(2) : ''; state.mode = v === 'up' ? 'up' : v.startsWith('m:') ? v.slice(2) : ''; saveState(); render(); };
+$('#sort').onchange = e => { state.sort=e.target.value; saveState(); render(); };
+$('#favBtn').onclick = () => { state.fav=!state.fav; syncUI(); render(); };
+$('#groupSel').onchange = e => { state.group=e.target.value; syncUI(); render(); };
+$('#folder').onchange = e => { state.folder=e.target.value; saveState(); render(); };
+$('#hidBtn').onclick = () => { state.showHidden=!state.showHidden; syncUI(); render(); };
+$('#size').oninput = e => { document.documentElement.style.setProperty('--size', e.target.value+'px'); saveState(); };
+$('#size').onchange = () => render();
+$('#reload').onclick = () => load(true).then(()=>toast('已从 Drive 刷新'));
+$('#setBtn').onclick = () => showSetup(true);
+
+// ---------------- 标题（存在本地 config.json，换浏览器也一样） ----------------
+const DEFAULT_TITLE = 'H3 提示词画廊';
+function applyTitle(t){ t = (t || '').trim() || DEFAULT_TITLE; $('#appTitle').textContent = t; document.title = t; }
+$('#appTitle').onclick = () => {
+  const span = $('#appTitle'), old = span.textContent;
+  const inp = Object.assign(document.createElement('input'), {id:'titleIn', value: old, maxLength: 40, title: '回车保存，Esc 取消，清空恢复默认'});
+  span.replaceWith(inp); inp.focus(); inp.select();
+  let done = false;
+  const finish = async (save) => {
+    if (done) return; done = true;
+    inp.replaceWith(span);
+    const t = inp.value.trim();
+    if (!save || t === old) return;
+    applyTitle(t);
+    try { const r = await api('/api/title', {method:'POST', body: JSON.stringify({title: t})}); status.title = r.title; applyTitle(r.title); toast('标题已保存'); }
+    catch(e){ applyTitle(old); toast('保存失败：' + e.message); }
+  };
+  inp.onkeydown = e => { if (e.key === 'Enter') finish(true); if (e.key === 'Escape') finish(false); };
+  inp.onblur = () => finish(true);
+};
+try { const s=JSON.parse(localStorage.getItem('h3state')||'{}'); if(s.size){ $('#size').value=s.size; document.documentElement.style.setProperty('--size', s.size+'px'); } } catch(e){}
+syncUI();
+
+// ---------------- 上传 ----------------
+let pending = [];
+const isMedia = f => /^(image|video)\//.test(f.type) || /\.(mov|m4v|webm|mp4|avif)$/i.test(f.name);
+function setFiles(fs){ pending = [...fs].filter(isMedia); $('#picked').textContent = pending.length ? pending.map(f=>f.name).join('、') : '没有可用的图片/视频'; }
+const canUpload = () => $('#bar').style.display !== 'none' && status.folder_id;
+$('#addBtn').onclick = () => { pending=[]; $('#picked').textContent=''; $('#addModal').classList.add('open'); };
+$('#aClose').onclick = () => $('#addModal').classList.remove('open');
+$('#pick').onclick = () => $('#file').click();
+$('#file').onchange = e => setFiles(e.target.files);
+const drop = $('#drop');
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('hover'); };
+drop.ondragleave = () => drop.classList.remove('hover');
+drop.ondrop = e => { e.preventDefault(); e.stopPropagation(); drop.classList.remove('hover'); $('#dropOverlay').style.display='none'; setFiles(e.dataTransfer.files); };
+let dragDepth = 0;
+window.addEventListener('dragenter', e => { if (canUpload() && [...e.dataTransfer.types].includes('Files') && !$('#addModal').classList.contains('open')) { dragDepth++; $('#dropOverlay').style.display='flex'; } });
+window.addEventListener('dragleave', () => { if (--dragDepth<=0){ dragDepth=0; $('#dropOverlay').style.display='none'; } });
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => { e.preventDefault(); dragDepth=0; $('#dropOverlay').style.display='none'; if (canUpload() && e.dataTransfer.files.length && !$('#addModal').classList.contains('open')) { $('#addBtn').click(); setFiles(e.dataTransfer.files); } });
+$('#aSave').onclick = async () => {
+  if (!pending.length) return toast('请先选择文件');
+  const meta = { prompt:$('#aPrompt').value, negative_prompt:$('#aNeg').value, params:parseParams($('#aParams').value),
+    tags:$('#aTags').value.split(/[,，]/).map(s=>s.trim()).filter(Boolean) };
+  $('#aSave').disabled = true;
+  let ok = 0;
+  for (const [i,f] of pending.entries()) {
+    $('#aSave').textContent = `上传中 ${i+1}/${pending.length}`;
+    try {
+      await api(`/api/upload?name=${encodeURIComponent(f.name)}&meta=${encodeURIComponent(JSON.stringify(meta))}`,
+        {method:'POST', body:f, headers:{'Content-Type': f.type || 'application/octet-stream'}});
+      ok++;
+    } catch(e){ toast(`${f.name} 上传失败：${e.message}`); }
+  }
+  $('#aSave').disabled = false; $('#aSave').textContent = '上传';
+  $('#addModal').classList.remove('open'); toast(`已上传 ${ok} 个文件到 Drive`); load(true);
+};
+
+boot();
+</script>
+</body>
+</html>
