@@ -83,7 +83,7 @@ button.sm{padding:2px 9px;font-size:12px;border-radius:6px}
 .dside textarea{min-height:0}
 .field{display:flex;flex-direction:column;min-width:0}
 .field.grow{flex:1;min-height:140px}
-.field.grow textarea{flex:1;resize:none;min-height:100px}
+.field.grow textarea{flex:1;resize:none;min-height:100px;overscroll-behavior:contain}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mono{font-family:ui-monospace,monospace;font-size:12px!important}
 .foot{padding-top:2px}
@@ -137,26 +137,34 @@ code{background:var(--chip);padding:1px 6px;border-radius:4px;font-size:12.5px;w
 .x-comp-head b{font-size:14px}
 .x-comp-head small{color:var(--muted);font-size:12px}
 .x-comp-body{display:grid;grid-template-columns:minmax(280px,420px) 1fr;gap:14px;margin-top:12px}
-.x-drop{border:2px dashed var(--line);border-radius:12px;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:10px;min-height:190px;transition:.15s}
+.x-drop{border:2px dashed var(--line);border-radius:12px;padding:12px;background:var(--bg);display:flex;flex-direction:column;gap:10px;min-height:190px;transition:.15s}
 .x-drop.hover{border-color:var(--accent);background:rgba(217,72,15,.06)}
 .x-drop-hint{text-align:center;color:var(--muted);font-size:12.5px;line-height:1.6;margin:auto 0}
 .x-drop-hint b{color:var(--text)}
-.x-stage{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;max-height:248px;overflow-y:auto;padding-right:2px}
+.x-drop-short{display:none}
+.x-drop.has-items .x-drop-empty{display:none}
+.x-drop.has-items .x-drop-short{display:inline}
+.x-drop.has-items .x-drop-hint{margin:auto 0 0;padding-top:8px;border-top:1px dashed var(--line);display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;font-size:12px;line-height:1.4}
+.x-stage{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start;align-content:start;max-height:480px;overflow-y:auto;padding-right:2px}
 .x-stage:empty{display:none}
-.x-stage-item{position:relative;border-radius:8px;overflow:hidden;background:var(--chip);border:1px solid var(--line);box-shadow:var(--shadow);max-width:100%;flex-shrink:0;cursor:grab}
+.x-stage.one{grid-template-columns:1fr;justify-items:center}
+.x-stage.many{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.x-stage-item{position:relative;border-radius:8px;overflow:hidden;background:var(--chip);border:1px solid var(--line);box-shadow:var(--shadow);width:100%;max-width:100%;cursor:grab}
+.x-stage.one .x-stage-item{width:auto}
 .x-stage-item.dragging,.x-vthumb.dragging{opacity:.38;cursor:grabbing}
 .x-stage-item.drag-l,.x-vthumb.drag-l{box-shadow:-3px 0 0 0 var(--accent)}
 .x-stage-item.drag-r,.x-vthumb.drag-r{box-shadow:3px 0 0 0 var(--accent)}
-.x-stage-item img,.x-stage-item video{display:block;max-height:170px;max-width:100%;width:auto;height:auto}
-.x-stage.mid .x-stage-item img,.x-stage.mid .x-stage-item video{height:126px;max-height:126px;width:auto}
-.x-stage.many .x-stage-item img,.x-stage.many .x-stage-item video{height:102px;max-height:102px;width:auto}
+.x-stage-item img,.x-stage-item video{display:block;width:100%;height:auto;max-height:240px;object-fit:cover}
+.x-stage.one .x-stage-item img,.x-stage.one .x-stage-item video{width:auto;max-width:100%;max-height:320px;object-fit:contain}
+.x-stage.mid .x-stage-item img,.x-stage.mid .x-stage-item video{max-height:190px}
+.x-stage.many .x-stage-item img,.x-stage.many .x-stage-item video{height:112px;max-height:112px}
 .x-stage-item .rm{position:absolute;top:4px;right:4px;width:18px;height:18px;padding:0;border-radius:50%;border:none;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer;z-index:2}
 .x-stage-item .rm:hover{background:#e03131}
 .x-stage-item .x-vbadge,.x-mcell .x-vbadge,.x-vthumb .x-vbadge{position:absolute;bottom:6px;left:6px;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#1d1d1f;border:1px solid rgba(0,0,0,.08);box-shadow:0 2px 6px rgba(0,0,0,.2);font-size:11px;font-weight:600;border-radius:999px;padding:1px 8px;z-index:2;pointer-events:none;display:inline-flex;align-items:center;gap:3px}
 .x-vthumb .x-vbadge{bottom:3px;left:3px;font-size:9.5px;padding:0 5px}
 .x-form{display:flex;flex-direction:column;gap:8px}
 .x-form textarea,.x-form input[type=text]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.x-form textarea{min-height:112px;resize:vertical}
+.x-form textarea{flex:1 0 auto;min-height:120px;resize:vertical;overscroll-behavior:contain}
 .x-src-wrap{display:flex;gap:6px}
 .x-src-wrap input{flex:1;min-width:0}
 .x-opt-panel{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:10px;background:var(--bg);border:1px dashed var(--line)}
@@ -246,6 +254,12 @@ code{background:var(--chip);padding:1px 6px;border-radius:4px;font-size:12.5px;w
 .pager .p-sep{width:1px;height:16px;background:var(--line);margin:0 4px}
 .pager .p-info{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
 .pager select{padding:3px 6px;font-size:12px;border-radius:6px;background:var(--bg);border:1px solid var(--line)}
+.pager.compact{margin:0;padding:3px 5px;border-radius:10px;gap:2px;background:var(--chip);box-shadow:none}
+.pager.compact button{padding:4px 8px;font-size:12px;min-width:28px;border-radius:7px}
+.pager.compact button:hover:not(:disabled){background:var(--panel);border-color:var(--line)}
+.pager.compact button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pager.compact .p-sep{height:14px;margin:0 3px}
+.pager.compact select{padding:3px 6px;font-size:12px;border-radius:7px;background:var(--panel);border:1px solid var(--line)}
 /* 重复灵感预警条 & 全局确认弹窗 */
 .x-dup-banner{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(245,159,0,.11);border:1px solid rgba(245,159,0,.45);gap:10px;align-items:center}
 .x-dup-banner.show{display:flex;flex-wrap:wrap}
@@ -328,9 +342,15 @@ body.readonly-mode #xModal input[type=text]{background:var(--bg);cursor:text}
         <div class="x-drop" id="xDropZone">
           <div class="x-stage" id="xStageGrid"></div>
           <div class="x-drop-hint" id="xDropHint">
-            <b>把 X 图片或本地图片/视频拖到这里</b><br>
-            X 视频可直接<b>拖入/粘贴推文链接</b>自动抓高清 MP4<br>
-            也可 <b>⌘V 粘贴截图</b>，<button type="button" class="sm" id="xPickBtn">选择本地文件</button> 或 <button type="button" class="sm" id="xPullMediaOnlyBtn" title="粘贴任意 X 帖子/引用帖链接，仅抓取视频或原图（不改动右侧提示词）">贴链接抓视频/图</button>
+            <span class="x-drop-empty">
+              <b>把 X 图片或本地图片/视频拖到这里</b><br>
+              X 视频可直接<b>拖入/粘贴推文链接</b>自动抓高清 MP4<br>
+              也可 <b>⌘V 粘贴截图</b>，
+            </span>
+            <span class="x-drop-short">拖入 / ⌘V 续加：</span>
+            <button type="button" class="sm" id="xPickBtn">选择本地文件</button>
+            <span class="x-drop-empty"> 或 </span>
+            <button type="button" class="sm" id="xPullMediaOnlyBtn" title="粘贴任意 X 帖子/引用帖链接，仅抓取视频或原图（不改动右侧提示词）">贴链接抓视频/图</button>
             <input type="file" id="xFileIn" multiple accept="image/*,video/*" hidden>
           </div>
         </div>
@@ -418,9 +438,12 @@ body.readonly-mode #xModal input[type=text]{background:var(--bg);cursor:text}
       <input type="file" id="xModalFileIn" multiple accept="image/*,video/*" hidden>
     </div>
     <div class="side dside">
-      <div class="dhead"><div class="fname">𝕏 灵感详情</div><button class="sm" id="xmClose" title="关闭 (Esc)">✕</button></div>
+      <div class="dhead" style="align-items:center">
+        <div class="fname">𝕏 灵感详情 <span style="font-weight:400;color:var(--muted);font-size:12px">· 提示词</span></div>
+        <button class="sm" id="xmCopy" style="white-space:nowrap;flex-shrink:0">复制提示词</button>
+        <button class="sm" id="xmClose" style="flex-shrink:0" title="关闭 (Esc)">✕</button>
+      </div>
       <div class="field grow">
-        <div class="lbl">提示词<span class="spacer"></span><button class="sm" id="xmCopy">复制提示词</button></div>
         <textarea id="xmPrompt" placeholder="提示词内容"></textarea>
       </div>
       <div class="field"><div class="lbl">反向提示词（选填）</div><textarea id="xmNeg" rows="2"></textarea></div>
@@ -789,7 +812,7 @@ function releaseVideos(root) {
   root.querySelectorAll('video').forEach(v => { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (_) {} });
 }
 
-function renderPagerHtml(kind, page, totalPages, total) {
+function renderPagerHtml(kind, page, totalPages, total, compact = false) {
   if (total <= 12) return '';
   let nums = '';
   if (totalPages > 1) {
@@ -806,26 +829,31 @@ function renderPagerHtml(kind, page, totalPages, total) {
       btns.push(`<button type="button" class="${n === page ? 'on' : ''}" data-pg="${n}" data-pk="${kind}">${n}</button>`);
       prev = n;
     }
-    nums = `<button type="button" data-pg="${page - 1}" data-pk="${kind}" ${page <= 1 ? 'disabled' : ''}>‹ 上一页</button>`
+    const prevLbl = compact ? '‹' : '‹ 上一页';
+    const nextLbl = compact ? '›' : '下一页 ›';
+    nums = `<button type="button" data-pg="${page - 1}" data-pk="${kind}" title="上一页 (←)" ${page <= 1 ? 'disabled' : ''}>${prevLbl}</button>`
       + btns.join('')
-      + `<button type="button" data-pg="${page + 1}" data-pk="${kind}" ${page >= totalPages ? 'disabled' : ''}>下一页 ›</button>`
+      + `<button type="button" data-pg="${page + 1}" data-pk="${kind}" title="下一页 (→)" ${page >= totalPages ? 'disabled' : ''}>${nextLbl}</button>`
       + '<span class="p-sep"></span>';
   }
   const opts = [[12, '12 条/页'], [24, '24 条/页'], [48, '48 条/页'], [96, '96 条/页'], [0, '全部']];
   const sel = `<select class="p-size" data-pk="${kind}" title="每页显示数量">${opts.map(([v, l]) => `<option value="${v}" ${pageSize === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  if (compact) {
+    return `<nav class="pager compact" aria-label="顶部分页">${nums}${sel}</nav>`;
+  }
   return `<nav class="pager" aria-label="分页">${nums}<span class="p-info">共 ${total} 条 ${sel}</span></nav>`;
 }
 
-function handlePagerClick(e) {
+function handlePagerClick(e, fromTop = false) {
   const b = e.target.closest('button[data-pg]');
   if (!b || b.disabled) return;
   const p = +b.dataset.pg, k = b.dataset.pk;
   if (k === 'x') {
     xPage = p; renderX();
-    ($('#xFilterBar') || $('#xMain')).scrollIntoView({behavior: 'smooth', block: 'start'});
+    if (!fromTop) ($('#xFilterBar') || $('#xMain')).scrollIntoView({behavior: 'smooth', block: 'start'});
   } else {
     gPage = p; render();
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    if (!fromTop) window.scrollTo({top: 0, behavior: 'smooth'});
   }
 }
 function handlePagerSize(e) {
@@ -1185,7 +1213,7 @@ function filteredX() {
   return r.sort((a, b) => xState.sort === 'old' ? ts(a) - ts(b) : ts(b) - ts(a));
 }
 
-function renderXFilterBar() {
+function renderXFilterBar(pgInfo = null) {
   const bar = $('#xFilterBar');
   if (!xItems.length) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
   const imgCnt = xItems.filter(xHasImage).length;
@@ -1200,15 +1228,17 @@ function renderXFilterBar() {
   ];
   if (txtCnt > 0 || xState.media === 'text') btns.push(['text', '纯文字', '', txtCnt]);
   const hasFilter = !!(xState.media || xState.fav || xState.q.trim() || xState.tags.size);
+  const topPagerHtml = pgInfo ? renderPagerHtml('x', pgInfo.page, pgInfo.totalPages, xView.length, true) : '';
   bar.style.display = 'flex';
   bar.innerHTML = `<div class="x-seg">${btns.map(([val, label, ic, n]) =>
     `<button type="button" class="${xState.media === val ? 'on' : ''}" data-xm="${val}">${ic}${label}<span class="n">${n}</span></button>`
   ).join('')}</div><span class="spacer"></span><span class="x-filter-meta"><span id="xLoadProgress" class="x-load-prog" style="display:none"></span>${
     hasFilter ? `<span>已筛选 ${xView.length} / ${xItems.length} 条</span><button type="button" class="sm" id="xResetFilter">重置</button>` : ''
-  }</span>`;
+  }</span>${topPagerHtml}`;
 }
 
 $('#xFilterBar').addEventListener('click', e => {
+  if (e.target.closest('.pager')) { handlePagerClick(e, true); return; }
   const b = e.target.closest('[data-xm]');
   if (b) { xState.media = b.dataset.xm; xPage = 1; renderX(); return; }
   if (e.target.id === 'xResetFilter') {
@@ -1216,6 +1246,7 @@ $('#xFilterBar').addEventListener('click', e => {
     syncUI(); renderX();
   }
 });
+$('#xFilterBar').addEventListener('change', handlePagerSize);
 
 let xMasonryRaf = 0;
 function layoutXMasonry() {
@@ -1368,11 +1399,11 @@ function renderX() {
   $('#tagBar').innerHTML = Object.entries(all).sort((a, b) => b[1] - a[1]).map(([t, n]) =>
     `<span class="chip ${xState.tags.has(t) ? 'on' : ''}" data-t="${esc(t)}">${esc(t)} ${n}</span>`
   ).join('');
-  renderXFilterBar();
   const list = $('#xList');
   const pager = $('#xPager');
   releaseVideos(list);
   if (!xItems.length) {
+    renderXFilterBar(null);
     if (!isReadonly()) expandXComposer(true);
     list.innerHTML = isReadonly()
       ? '<div class="empty-state">𝕏 灵感库暂时还没有内容</div>'
@@ -1381,11 +1412,13 @@ function renderX() {
     return;
   }
   if (!xView.length) {
+    renderXFilterBar(null);
     list.innerHTML = '<div class="empty-state">没有符合筛选条件的 𝕏 灵感</div>';
     pager.innerHTML = '';
     return;
   }
   const pg = paginate(xView, xPage); xPage = pg.page;
+  renderXFilterBar(pg);
   const ro = isReadonly();
   const curGen = ++xLoadGen;
   const imgLoadingAttr = pg.slice.length <= 40 ? 'eager' : 'lazy';
@@ -1461,15 +1494,16 @@ function renderX() {
 // 渲染暂存参考图/视频预览
 function renderXStage() {
   const g = $('#xStageGrid');
+  g.classList.toggle('one', xStaged.length === 1);
   g.classList.toggle('mid', xStaged.length >= 3 && xStaged.length <= 4);
   g.classList.toggle('many', xStaged.length >= 5);
-  g.innerHTML = xStaged.map((im, i) => `<div class="x-stage-item" draggable="true" data-si="${i}" title="${esc(im.name)}（可左右拖动排序）">
+  $('#xDropZone').classList.toggle('has-items', xStaged.length > 0);
+  g.innerHTML = xStaged.map((im, i) => `<div class="x-stage-item" draggable="true" data-si="${i}" title="${esc(im.name)}（可拖动排序）">
     ${im.type === 'video'
       ? `<video src="${im.previewUrl}" muted loop playsinline autoplay draggable="false"></video><span class="x-vbadge">▶ 视频</span>`
       : `<img src="${im.previewUrl}" alt="" draggable="false">`}
     <button type="button" class="rm" data-rm="${i}" title="移除">×</button>
   </div>`).join('');
-  $('#xDropHint').style.margin = xStaged.length ? '0' : 'auto 0';
 }
 
 function bindDragReorder(container, itemSel, idxKey, onMove) {
@@ -2317,10 +2351,53 @@ $('#xmDel').onclick = async () => {
   } catch (e) { toast('删除失败：' + e.message); }
 };
 document.addEventListener('keydown', e => {
-  if (!$('#xModal').classList.contains('open')) return;
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (!isReadonly()) saveXModal(false, true); return; }
-  if (e.key === 'Escape') { closeXModal(); return; }
-  if (e.target.matches('textarea,input')) return;
+  if ($('#xModal').classList.contains('open')) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (!isReadonly()) saveXModal(false, true); return; }
+    if (e.key === 'Escape') { closeXModal(); return; }
+    return;
+  }
+  if ($('#modal').classList.contains('open') || $('#addModal').classList.contains('open') || $('#xDupModal').classList.contains('open')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey || e.target.matches('textarea,input,select')) return;
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  const delta = e.key === 'ArrowRight' ? 1 : -1;
+  if (currentPage === 'x') {
+    const pg = paginate(xView, xPage);
+    if (pg.totalPages <= 1) return;
+    const next = Math.max(1, Math.min(pg.totalPages, pg.page + delta));
+    if (next !== xPage) {
+      e.preventDefault();
+      xPage = next; renderX();
+      ($('#xFilterBar') || $('#xMain')).scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+  } else if (currentPage === 'gallery') {
+    const pg = paginate(view, gPage);
+    if (pg.totalPages <= 1) return;
+    const next = Math.max(1, Math.min(pg.totalPages, pg.page + delta));
+    if (next !== gPage) {
+      e.preventDefault();
+      gPage = next; render();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  }
+});
+
+// 鼠标停在提示词文本框内滚轮时彻底锁住滚动链，触顶/触底或未溢出时也不带动外层页面滚动
+['#xPromptIn', '#xmPrompt', '#mPrompt'].forEach(sel => {
+  const ta = $(sel);
+  if (!ta) return;
+  ta.addEventListener('wheel', e => {
+    if (e.ctrlKey) return;
+    const canScroll = ta.scrollHeight > ta.clientHeight + 1;
+    if (!canScroll) {
+      e.preventDefault();
+      return;
+    }
+    const atTop = ta.scrollTop <= 0 && e.deltaY < 0;
+    const atBottom = ta.scrollTop + ta.clientHeight >= ta.scrollHeight - 1 && e.deltaY > 0;
+    if (atTop || atBottom) {
+      e.preventDefault();
+    }
+  }, { passive: false });
 });
 
 boot();
