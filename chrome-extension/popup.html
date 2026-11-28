@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>H3 𝕏 灵感剪藏</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo">H3</span>
+      <div>
+        <b>𝕏 灵感剪藏</b>
+        <small id="subStatus">正在扫描当前 X 页面…</small>
+      </div>
+    </div>
+    <div class="top-acts">
+      <button type="button" id="rescanBtn" class="sm" title="重新扫描当前页面（若评论区刚滚出来可点此刷新）">重新扫描</button>
+      <a href="http://127.0.0.1:8765/#x" target="_blank" rel="noopener" class="sm link">画廊 ↗</a>
+    </div>
+  </header>
+
+  <main id="body">
+    <div id="stateBox" class="state">正在读取推文与评论区…</div>
+
+    <div id="formWrap" style="display:none">
+      <div id="dupCard" class="dup" style="display:none"></div>
+
+      <div id="metaRow" class="meta-row"></div>
+      <label class="chk" id="quoteWrap" style="display:none;margin-bottom:8px">
+        <input type="checkbox" id="quoteChk" checked> <span id="quoteLbl">同时抓取引用帖子的视频/原图</span>
+      </label>
+      <div id="scrollTip" class="tip" style="display:none"></div>
+
+      <div class="seg-row" id="modeRow" style="display:none">
+        <span class="lbl">提示词来源</span>
+        <div class="seg" id="modeSeg">
+          <button type="button" data-mode="reply">评论区提示词</button>
+          <button type="button" data-mode="main">主贴正文</button>
+          <button type="button" data-mode="both">主贴 + 评论</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-head">
+          <span>提示词内容</span>
+          <small id="charCount">0 字</small>
+        </div>
+        <textarea id="promptIn" placeholder="提取到的提示词（可直接修改，按 ⌘+Enter 保存）"></textarea>
+      </div>
+
+      <div class="two">
+        <input type="text" id="tagsIn" placeholder="标签（逗号分隔，选填）">
+        <input type="text" id="notesIn" placeholder="备注（选填）">
+      </div>
+
+      <div id="msgBox" class="msg" style="display:none"></div>
+
+      <div class="foot">
+        <label class="chk" id="skipMediaWrap" style="display:none" title="合并时若旧条目已有视频/图，可勾选避免重复下载">
+          <input type="checkbox" id="skipMediaChk" checked> 保留旧媒体（只补提示词）
+        </label>
+        <span class="spacer"></span>
+        <button type="button" id="mergeBtn" style="display:none">合并到旧条目</button>
+        <button type="button" id="saveBtn" class="primary">保存到 H3 灵感库</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

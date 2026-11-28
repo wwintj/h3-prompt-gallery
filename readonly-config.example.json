@@ -1,0 +1,12 @@
+{
+  "port": 8766,
+  "title": "𝕏 灵感库",
+  "x_folder_id": "YOUR_GOOGLE_DRIVE_X_FOLDER_ID",
+  "service_account": "service-account.json",
+  "password": "CHANGE_ME",
+  "allowed_hosts": [
+    "your-domain.example.com"
+  ],
+  "ttl": 60,
+  "thumb_cache_dir": "/tmp/h3_thumb_cache"
+}

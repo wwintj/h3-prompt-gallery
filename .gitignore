@@ -1,9 +1,13 @@
 # 私密文件：OAuth 客户端密钥、登录令牌、个人配置与数据
 credentials.json
 client_secret*.json
+service-account*.json
 token.json
 config.json
+readonly-config.json
+.guest_secret
 meta-backup.json
+x-meta-backup.json
 OAuth-Client/
 
 # 系统与本机文件
@@ -11,3 +15,9 @@ OAuth-Client/
 .claude/
 __pycache__/
 *.pyc
+cf-worker/node_modules/
+cf-worker/.wrangler/
+cf-worker/.dev.vars
+cf-worker/wrangler.toml
+cf-worker/src/assets/
+cf-worker/package-lock.json

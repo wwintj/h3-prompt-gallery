@@ -1,0 +1,20 @@
+name = "h3-x-gallery"
+main = "src/worker.js"
+compatibility_date = "2025-05-01"
+workers_dev = false
+preview_urls = false
+
+# 复制本文件为 wrangler.toml，填入你的 Cloudflare 自定义域名与 Google Drive 文件夹 ID
+routes = [
+  { pattern = "your-domain.example.com", custom_domain = true }
+]
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html", "**/*.svg"]
+fallthrough = true
+
+[vars]
+X_FOLDER_ID = "YOUR_GOOGLE_DRIVE_X_FOLDER_ID"
+SITE_TITLE = "𝕏 灵感库"
+META_TTL_SECONDS = "60"

@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "H3 𝕏 灵感剪藏",
+  "version": "1.0.0",
+  "description": "在 X (Twitter) 帖子页一键提取主贴最高清原图/视频 + 评论区作者完整提示词，直接存入本地 H3 灵感库。",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8765/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "剪藏到 H3 𝕏 灵感库",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
